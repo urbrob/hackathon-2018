@@ -1,3 +1,4 @@
 Django==2.1.2
+django-admin-colors
 psycopg2
 django-storages==1.7.1
