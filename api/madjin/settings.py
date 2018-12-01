@@ -152,3 +152,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# File storage
+
+DEFAULT_FILE_STORAGE = 'storages.backends.dropbox.DropBoxStorage'
+
+DROPBOX_OAUTH2_TOKEN = 'SxF0KIelNnAAAAAAAAAACjHlaypZRkxgFYkrlC17699akmL2NNYqSRFCCSiJ-lhe'
+
+MEDIA_URL = '/media/'

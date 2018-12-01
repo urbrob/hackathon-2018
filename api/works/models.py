@@ -71,11 +71,12 @@ class Task(models.Model):
     description = models.TextField()
 
     def __str__(self):
-        return f'{self.title} - {self.task_list.group.name}'
+        return f'{self.title}'
 
 
 class Test(models.Model):
     task = models.ManyToManyField(Task)
+    file = models.FileField(upload_to='reports/')
 
 
 
