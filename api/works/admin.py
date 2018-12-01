@@ -17,6 +17,9 @@ class TaskInline(admin.TabularInline):
     model = Task
     extra = 0
 
+class TestForTaskInline(admin.TabularInline):
+    model = Test.task.through
+
 class UserInline(admin.TabularInline):
     model = User
     extra = 0
@@ -56,10 +59,6 @@ class GroupAdmin(admin.ModelAdmin):
     ]
 
 
-@admin.register(TasksList)
-class TasksListAdmin(admin.ModelAdmin):
-    fields = ('id', )
-    list_display = ('id', )
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
@@ -69,12 +68,15 @@ class ReportAdmin(admin.ModelAdmin):
     inlines = [
         TestResultInline,
     ]
+    #def get_queryset(self, request):
+    #    return super(ReportAdmin, self).get_queryset(request).filter(status__user=request.user.status)
+
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     search_fields = ['first_name', 'last_name', 'organization', 'status']
-    fields = ('first_name', 'last_name', 'organization', 'status')
-    list_display = ('first_name', 'last_name', 'organization', 'status')
+    fields = ('first_name', 'last_name', 'organization', 'status', 'username')
+    list_display = ('first_name', 'last_name', 'organization', 'status', 'username')
     inlines = [
         GroupMembershipInline,
     ]
@@ -91,7 +93,12 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ['title']
     fields = ('title', 'description')
     list_display =  ('title', 'description')
-
+    inlines = [
+        TestForTaskInline,
+    ]
+    exclude = ('test',)
+    def get_queryset(self, request):
+        return super(TaskAdmin, self).get_queryset(request).filter(task_list__organization=request.user.organization)
 
 @admin.register(Test)
 class TestAdmin(admin.ModelAdmin):

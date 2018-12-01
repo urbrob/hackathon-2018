@@ -107,4 +107,4 @@ class Report(models.Model):
     teacher_comment = models.CharField(null=True, max_length=250)
 
     def __str__(self):
-        return f'{self.taask.title} - {self.tests_result}'
+        return f'{self.task.title}'
