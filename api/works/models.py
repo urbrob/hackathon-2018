@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     group = models.ManyToManyField('Group', through='GroupMembership')
-    organization = models.ForeignKey('Organization', null=True on_delete=models.CASCADE)
+    organization = models.ForeignKey('Organization', null=True, on_delete=models.CASCADE)
     STUDENT = 'ST'
     TEACHER = 'TE'
     ADMIN = 'SU'
@@ -66,12 +66,12 @@ class TaskAssign(models.Model):
 
 
 class Task(models.Model):
-    tesk_list = models.ManyToManyField(TasksList, through='TaskAssign')
+    task_list = models.ManyToManyField(TasksList, through='TaskAssign')
     title = models.CharField(max_length=50)
     description = models.TextField()
 
     def __str__(self):
-        return f'{self.title} - {self.tesk_list.group.name}'
+        return f'{self.title} - {self.task_list.group.name}'
 
 
 class Test(models.Model):

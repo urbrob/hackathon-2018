@@ -40,9 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'works',
-<<<<<<< HEAD
     'admincolors',
+
+    'works',
 
 ]
 
@@ -53,8 +53,6 @@ ADMIN_COLORS = [
     ('Lite', 'admincolors/css/lite.css'),
     ('Dark Blue', 'admincolors/css/dark-blue.css'),
     ('Gray', 'admincolors/css/gray.css')
-=======
->>>>>>> 21538b7aff23e145b2b2d5c9232b897515ec8e5f
 ]
 
 MIDDLEWARE = [
