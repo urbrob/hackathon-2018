@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+
 class User(AbstractUser):
-    group = models.ManyToManyField('Group')
+    group = models.ManyToManyField('Group', through='GroupMembership')
     report = models.ManyToManyField('Report')
-    organization = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='organization')
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE, null=True)
     STUDENT = 'ST'
     TEACHER = 'TE'
     ADMIN = 'SU'
@@ -19,6 +20,7 @@ class User(AbstractUser):
         default=STUDENT,
     )
 
+
 class Organization(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=100)
@@ -28,24 +30,52 @@ class Organization(models.Model):
     def __str__(self):
         return self.name
 
+class GroupMembership(models.Model):
+    group = models.ForeignKey('Group', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_teacher = models.BooleanField(default=False)
+
+
 class Group(models.Model):
     name = models.CharField(max_length=50)
-    teacher = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='teacher')
-    tasks = models.ManyToManyField('TasksList')
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+
 
 class TasksList(models.Model):
     group = models.ManyToManyField(Group)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
 
+
+class TaskAssign(models.Model):
+    IN_PROGRESS = 'in-progress'
+    FAILED = 'failed'
+    PASSED = 'passed'
+    TASK_STATUSES = (
+        (IN_PROGRESS, 'In progress'),
+        (FAILED, 'Failed'),
+        (PASSED, 'Passed'),
+    )
+    task_list = models.ForeignKey(TasksList, on_delete=models.CASCADE)
+    error = models.CharField(null=True, max_length=150)
+    status = models.CharField(max_length=30, choices=TASK_STATUSES)
+    line = models.IntegerField(null=True)
+    task = models.ForeignKey('Task', on_delete=models.CASCADE)
+
+
 class Task(models.Model):
-    list = models.ManyToManyField(TasksList, through='task_assign')
+    tesk_list = models.ManyToManyField(TasksList, through='TaskAssign')
+
 
 class Test(models.Model):
     task = models.ManyToManyField(Task)
 
+
+class TestResult(models.Model):
+    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+    report = models.ForeignKey('Report', on_delete=models.CASCADE)
+
+
 class Report(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='teacher', null=True)
-    result = models.ManyToManyField(Test, through='test_result')
-    error_message = models.ManyToManyField(Test, through='test_result')
+    accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='reports', null=True)
+    tests_result = models.ManyToManyField(Test, through='TestResult')
