@@ -48,7 +48,6 @@ class TasksList(models.Model):
 class TaskAssign(models.Model):
     task_list = models.ForeignKey(TasksList, on_delete=models.CASCADE)
     error = models.CharField(null=True, max_length=150)
-    status = models.CharField(max_length=30, choices=TASK_STATUSES)
     line = models.IntegerField(null=True)
 
 

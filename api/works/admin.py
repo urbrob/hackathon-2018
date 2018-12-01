@@ -105,21 +105,21 @@ class GroupMembershipAdmin(admin.ModelAdmin):
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('id',)
     inlines = [
-        TaskAdminInline,
+        TaskInline,
     ]
 
 @admin.register(Test)
 class TestAdmin(admin.ModelAdmin):
     list_display = ('id',)
     inlines = [
-        TaskAdminInline,
+        TaskInline,
     ]
 
 @admin.register(TestResult)
 class TestResultAdmin(admin.ModelAdmin):
     list_display = ('id',)
     inlines = [
-        TaskAdminInline,
+        TaskInline,
         TestInline,
         ReportInline,
     ]
