@@ -51,17 +51,11 @@ class GroupAdmin(admin.ModelAdmin):
     search_fields = ['name']
     fields = ('id', 'name',)
     list_display = ('id', 'name',)
-    inlines = [
-        OrganizationInline,
-    ]
+
 
 @admin.register(TasksList)
 class TasksListAdmin(admin.ModelAdmin):
     list_display = ('id', )
-    inlines = [
-        OrganizationInline,
-        GroupInline,
-    ]
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
@@ -74,52 +68,38 @@ class ReportAdmin(admin.ModelAdmin):
 
 @admin.register(TaskAssign)
 class TaskAssignAdmin(admin.ModelAdmin):
-    search_fields = ['error', 'status', 'line']
-    fields = ('id', 'error', 'status', 'line')
-    list_display = ('id', 'error', 'status', 'line')
-    inlines = [
-        TaskInline,
-    ]
+    fields = ('id', )
+    list_display = ('id', )
+
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     search_fields = ['organization', 'status']
     fields = ('id', 'organization', 'status')
     list_display = ('id', 'organization', 'status')
-    inlines = [
-        TestResultInline,
-        GroupInline,
-    ]
+    
 
 @admin.register(GroupMembership)
 class GroupMembershipAdmin(admin.ModelAdmin):
     search_fields = ['is_teacher']
     fields = ('id', 'is_teacher')
     list_display = ('id', 'is_teacher')
-    inlines = [
-        UserInline,
-        GroupInline,
-    ]
+
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('id',)
-    inlines = [
-        TaskInline,
-    ]
+    search_fields = ['title']
+    fields = ('id', 'title', 'description')
+    list_display = ('id', 'title', 'description')
+
 
 @admin.register(Test)
 class TestAdmin(admin.ModelAdmin):
     list_display = ('id',)
-    inlines = [
-        TaskInline,
-    ]
+
 
 @admin.register(TestResult)
 class TestResultAdmin(admin.ModelAdmin):
-    list_display = ('id',)
-    inlines = [
-        TaskInline,
-        TestInline,
-        ReportInline,
-    ]
+    search_fields = ['error', 'status', 'line']
+    fields = ('id', 'error', 'status', 'line')
+    list_display = ('id', 'error', 'status', 'line')
