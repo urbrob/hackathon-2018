@@ -76,8 +76,7 @@ class Task(models.Model):
 
 class Test(models.Model):
     task = models.ManyToManyField(Task)
-
-
+    file = models.FileField()
 
 class TestResult(models.Model):
     IN_PROGRESS = 'in-progress'

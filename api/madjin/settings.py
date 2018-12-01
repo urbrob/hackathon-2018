@@ -121,3 +121,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# File storage shit
+
+LOCATION = 'ftp://cwiekdawid1_madjin:zaq1@WSX@ftp.cwiekdawid.nazwa.pl:21'
+
+BASE_URL = '/reports'
