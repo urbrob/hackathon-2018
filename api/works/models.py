@@ -4,8 +4,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     group = models.ManyToManyField('Group', through='GroupMembership')
-    report = models.ManyToManyField('Report')
-    organization = models.ForeignKey('Organization', on_delete=models.CASCADE, null=True)
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE)
     STUDENT = 'ST'
     TEACHER = 'TE'
     ADMIN = 'SU'
@@ -47,19 +46,10 @@ class TasksList(models.Model):
 
 
 class TaskAssign(models.Model):
-    IN_PROGRESS = 'in-progress'
-    FAILED = 'failed'
-    PASSED = 'passed'
-    TASK_STATUSES = (
-        (IN_PROGRESS, 'In progress'),
-        (FAILED, 'Failed'),
-        (PASSED, 'Passed'),
-    )
     task_list = models.ForeignKey(TasksList, on_delete=models.CASCADE)
     error = models.CharField(null=True, max_length=150)
     status = models.CharField(max_length=30, choices=TASK_STATUSES)
     line = models.IntegerField(null=True)
-    task = models.ForeignKey('Task', on_delete=models.CASCADE)
 
 
 class Task(models.Model):
@@ -71,11 +61,21 @@ class Test(models.Model):
 
 
 class TestResult(models.Model):
+    IN_PROGRESS = 'in-progress'
+    FAILED = 'failed',
+    PASSED = 'passed'
+    TASK_STATUSES = (
+        (IN_PROGRESS, 'In progress'),
+        (FAILED, 'Failed'),
+        (PASSED, 'Passed')
+    )
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     report = models.ForeignKey('Report', on_delete=models.CASCADE)
+    task = models.ForeignKey('Task', on_delete=models.CASCADE)
 
 
 class Report(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='reports', null=True)
     tests_result = models.ManyToManyField(Test, through='TestResult')
+    student = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -1,6 +1,9 @@
 from django.contrib import admin
-from works.models import Organization, Group, TasksList, Report
+from works.models import User, Organization, GroupMembership, Group, TasksList, TaskAssign, Task, Test, TestResult, Report
 
+class OrganizationInline(admin.TabularInline):
+    model = Organization
+    extra = 0
 
 class GroupInline(admin.TabularInline):
     model = Group
@@ -31,13 +34,13 @@ class ReportInline(admin.TabularInline):
     extra = 0
 
 class GroupMembershipInline(admin.TabularInline):
-    model = Report
+    model = GroupMembership
     extra = 0
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     search_fields = ['name', 'address', 'email_contact', 'phone_contact']
-    fields = ('name', 'address', 'email_contact', 'phone_contact')
+    fields = ('id', 'name', 'address', 'email_contact', 'phone_contact')
     inlines = [
         GroupInline,
         TasksListInline,
@@ -45,29 +48,78 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
-    search_fields = ['name', 'organization']
-    fields = ('name', 'organization')
-    list_display = ('name', 'organization')
+    search_fields = ['name']
+    fields = ('id', 'name',)
+    list_display = ('id', 'name',)
+    inlines = [
+        OrganizationInline,
+    ]
 
 @admin.register(TasksList)
 class TasksListAdmin(admin.ModelAdmin):
     list_display = ('id', )
+    inlines = [
+        OrganizationInline,
+        GroupInline,
+    ]
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    search_fields = ['task']
-    fields = ('task',)
-    list_display = ('task',)
+    search_fields = ['task', 'accepted_by', 'student']
+    fields = ('id', 'task', 'accepted_by', 'student')
+    list_display = ('id', 'task', 'accepted_by', 'student' )
+    inlines = [
+        TestResultInline,
+    ]
 
 @admin.register(TaskAssign)
 class TaskAssignAdmin(admin.ModelAdmin):
     search_fields = ['error', 'status', 'line']
-    fields = ('error', 'status', 'line')
-    list_display = ('error', 'status', 'line')
+    fields = ('id', 'error', 'status', 'line')
+    list_display = ('id', 'error', 'status', 'line')
     inlines = [
         TaskInline,
-        TasksListInline,
     ]
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
+    search_fields = ['organization', 'status']
+    fields = ('id', 'organization', 'status')
+    list_display = ('id', 'organization', 'status')
+    inlines = [
+        TestResultInline,
+        GroupInline,
+    ]
+
+@admin.register(GroupMembership)
+class GroupMembershipAdmin(admin.ModelAdmin):
+    search_fields = ['is_teacher']
+    fields = ('id', 'is_teacher')
+    list_display = ('id', 'is_teacher')
+    inlines = [
+        UserInline,
+        GroupInline,
+    ]
+
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ('id',)
+    inlines = [
+        TaskAdminInline,
+    ]
+
+@admin.register(Test)
+class TestAdmin(admin.ModelAdmin):
+    list_display = ('id',)
+    inlines = [
+        TaskAdminInline,
+    ]
+
+@admin.register(TestResult)
+class TestResultAdmin(admin.ModelAdmin):
+    list_display = ('id',)
+    inlines = [
+        TaskAdminInline,
+        TestInline,
+        ReportInline,
+    ]
