@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     group = models.ManyToManyField('Group', through='GroupMembership')
-    organization = models.ForeignKey('Organization', on_delete=models.CASCADE)
+    organization = models.ForeignKey('Organization', null=True, on_delete=models.CASCADE)
     STUDENT = 'ST'
     TEACHER = 'TE'
     ADMIN = 'SU'
@@ -44,6 +44,7 @@ class GroupMembership(models.Model):
 class Group(models.Model):
     name = models.CharField(max_length=50)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+
 
     def __str__(self):
         return f'{self.name} - {self.organization.name}'
