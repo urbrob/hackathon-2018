@@ -1,14 +1,38 @@
-version: '3'
-
+version: '3.6'
 services:
+  redis:
+    image: "redis:3.0-alpine"
+    command: redis-server
+    volumes:
+      - "redis:/data"
+    ports:
+      - "6379:6379"
   db:
     image: postgres
   web:
     build: .
     command: python3 manage.py runserver 0.0.0.0:8000
+    environment:
+      DEBUG: "True"
+      BROKER_URL: "redis://redis:6379"
     volumes:
       - .:/code
     ports:
       - "8000:8000"
     depends_on:
       - db
+  celery:
+    build: .
+    command: celery -A madjin worker -l info
+    environment:
+      DEBUG: "True"
+      BROKER_URL: "redis://redis:6379"
+      CELERY_RDB_PORT: 6900
+      CELERY_RDB_HOST: "0.0.0.0"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/code
+volumes:
+  redis:
