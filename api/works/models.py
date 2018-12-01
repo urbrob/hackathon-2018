@@ -60,6 +60,7 @@ class TasksList(models.Model):
 class TaskAssign(models.Model):
     task_list = models.ForeignKey(TasksList, on_delete=models.CASCADE)
     task = models.ForeignKey('Task', on_delete=models.CASCADE)
+    deadline_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.task_list.group.name} - {self.task.list.organization}'
@@ -75,6 +76,15 @@ class Task(models.Model):
 
 
 class Test(models.Model):
+    VALUE_TYPE = 'value_type'
+    VALUE_EQUALS = 'value_equals'
+    TEST_TYPES = (
+        (VALUE_TYPE, 'Value type check'),
+        (VALUE_EQUALS, 'Value equals'),
+    )
+    test_type = models.CharField(choices=TEST_TYPES, max_length=50)
+    value = models.CharField(max_length=100, null=True, blank=True)
+    function_name = models.CharField(max_length=100, null=True, blank=True)
     task = models.ManyToManyField(Task)
 
 
@@ -104,6 +114,7 @@ class Report(models.Model):
     accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='reports', null=True)
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     teacher_comment = models.CharField(null=True, max_length=250)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
 
     def __str__(self):
         return f'{self.taask.title} - {self.tests_result}'
