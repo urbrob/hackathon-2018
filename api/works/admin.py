@@ -6,6 +6,10 @@ class GroupInline(admin.TabularInline):
     model = Group
     extra = 0
 
+class TasksListInline(admin.TabularInline):
+    model = TasksList
+    extra = 0
+
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
@@ -19,7 +23,7 @@ class OrganizationAdmin(admin.ModelAdmin):
 class Group(admin.ModelAdmin):
     search_fields = ['name', 'teacher', 'organization']
     fields = ('name', 'teacher', 'organization')
-    list_display = ('name', 'teacher', 'organization_name')
+    list_display = ('name', 'teacher', 'organization')
 
 @admin.register(TasksList)
 class TasksList(admin.ModelAdmin):

@@ -1,6 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+class User(AbstractUser):
+    group = models.ManyToManyField('Group')
+    report = models.ManyToManyField('Report')
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='organization')
+    STUDENT = 'ST'
+    TEACHER = 'TE'
+    ADMIN = 'SU'
+    STATUS_CHOICES = (
+        (STUDENT, 'Student'),
+        (TEACHER, 'Teacher'),
+        (ADMIN, 'Admin'),
+    )
+    status = models.CharField(
+        max_length=2,
+        choices=STATUS_CHOICES,
+        default=STUDENT,
+    )
 
 class Organization(models.Model):
     name = models.CharField(max_length=50)
@@ -13,8 +30,8 @@ class Organization(models.Model):
 
 class Group(models.Model):
     name = models.CharField(max_length=50)
-    teacher = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="teacher")
-    tasks = models.ManyToManyField(TasksList)
+    teacher = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='teacher')
+    tasks = models.ManyToManyField('TasksList')
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
 
 class TasksList(models.Model):
@@ -29,5 +46,6 @@ class Test(models.Model):
 
 class Report(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-
-class User(AbstractUser):
+    accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='teacher', null=True)
+    result = models.ManyToManyField(Test, through='test_result')
+    error_message = models.ManyToManyField(Test, through='test_result')
