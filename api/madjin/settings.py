@@ -80,6 +80,19 @@ DATABASES = {
     }
 }
 
+BROKER_URL = os.environ.get('BROKER_URL', 'redis://localhost:6379')
+CELERY_BROKER_URL = BROKER_URL
+CELERY_RESULT_BACKEND = BROKER_URL
+CELERY_BACKEND_URL = BROKER_URL
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Poland'
+CELERY_IMPORTS = (
+    'madjin.celery',
+)
+CELERY_RDB_PORT = os.environ.get('CELERY_RDB_PORT', '6903')
+CELERY_RDB_HOTS = os.environ.get('CELERY_RDB_HOST', 'localhost')
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
