@@ -145,7 +145,6 @@ class Test(models.Model):
     function_name = models.CharField(max_length=100, null=True, blank=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='tests')
 
-<<<<<<< HEAD
     @property
     def get_value(self):
         if self.value == 'True':
@@ -157,8 +156,6 @@ class Test(models.Model):
         except ValueError:
             return self.value
 
-=======
->>>>>>> c17956a33c2a8105f0868b00cc56dd37fdb70c1f
     def __str__(self):
         return f'{self.test_type} -> {self.value} in {self.function_name} for {self.task.title}'
 
