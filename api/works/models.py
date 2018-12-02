@@ -29,19 +29,28 @@ class User(AbstractUser):
 
         if self.status == self.STUDENT:
             self.user_permissions.clear()
-            self.user_permissions.add(Permission.objects.get(codename='view_report'),
+            self.user_permissions.add(
+            Permission.objects.get(codename='view_report'),
             Permission.objects.get(codename='add_report'),
+            Permission.objects.get(codename='change_report'),
             Permission.objects.get(codename='view_testresult'),
+            Permission.objects.get(codename='change_testresult'),
             Permission.objects.get(codename='view_taskslist'),
+            Permission.objects.get(codename='change_taskslist'),
             Permission.objects.get(codename='view_task'),
-            Permission.objects.get(codename='view_test'))
+            Permission.objects.get(codename='change_task'),
+            Permission.objects.get(codename='view_test'),
+            Permission.objects.get(codename='change_test'))
 
         if self.status == self.TEACHER:
             self.user_permissions.clear()
-            self.user_permissions.add(Permission.objects.get(codename='view_users'),
+            self.user_permissions.add(
+            Permission.objects.get(codename='view_user'),
+            Permission.objects.get(codename='change_user'),
             Permission.objects.get(codename='view_report'),
             Permission.objects.get(codename='change_report'),
             Permission.objects.get(codename='view_testresult'),
+            Permission.objects.get(codename='change_testresult'),
             Permission.objects.get(codename='view_taskslist'),
             Permission.objects.get(codename='add_taskslist'),
             Permission.objects.get(codename='change_taskslist'),
@@ -59,9 +68,7 @@ class User(AbstractUser):
             Permission.objects.get(codename='delete_groupmembership'),
             Permission.objects.get(codename='change_groupmembership'),
             Permission.objects.get(codename='view_group', content_type__app_label='works'),
-            Permission.objects.get(codename='add_groupmembership'),
-            Permission.objects.get(codename='delete_groupmembership'),
-            Permission.objects.get(codename='change_groupmembership'))
+            Permission.objects.get(codename='change_group', content_type__app_label='works'))
 
         if self.status == self.ADMIN:
             self.user_permissions.clear()
@@ -138,6 +145,7 @@ class Test(models.Model):
     function_name = models.CharField(max_length=100, null=True, blank=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='tests')
 
+<<<<<<< HEAD
     @property
     def get_value(self):
         if self.value == 'True':
@@ -149,6 +157,8 @@ class Test(models.Model):
         except ValueError:
             return self.value
 
+=======
+>>>>>>> c17956a33c2a8105f0868b00cc56dd37fdb70c1f
     def __str__(self):
         return f'{self.test_type} -> {self.value} in {self.function_name} for {self.task.title}'
 
