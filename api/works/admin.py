@@ -19,7 +19,7 @@ class TaskInline(admin.TabularInline):
     extra = 0
 
 class TestForTaskInline(admin.TabularInline):
-    model = Test.task.through
+    model = Test
 
 class UserInline(admin.TabularInline):
     model = User
@@ -69,8 +69,6 @@ class ReportAdmin(admin.ModelAdmin):
     inlines = [
         TestResultInline,
     ]
-    #def get_queryset(self, request):
-    #    return super(ReportAdmin, self).get_queryset(request).filter(status__user=request.user.status)
 
 
 @admin.register(User)
