@@ -68,8 +68,6 @@ class ReportAdmin(admin.ModelAdmin):
     inlines = [
         TestResultInline,
     ]
-    #def get_queryset(self, request):
-    #    return super(ReportAdmin, self).get_queryset(request).filter(status__user=request.user.status)
 
 
 @admin.register(User)
@@ -77,15 +75,25 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ['first_name', 'last_name', 'organization', 'status']
     fields = ('first_name', 'last_name', 'organization', 'status', 'username')
     list_display = ('first_name', 'last_name', 'organization', 'status', 'username')
+    list_display_links = ('first_name', 'last_name', 'organization', 'status', 'username')
     inlines = [
         GroupMembershipInline,
     ]
+    def get_queryset(self, request):
+        if request.user.status == User.TEACHER:
+            return super(UserAdmin, self).get_queryset(request).filter(status=User.STUDENT,
+                group__in=GroupMembership.objects.filter(is_teacher=True, user=request.user).values_list('group', flat=True))
+        elif request.user.status == User.STUDENT:
+            return []
+        return super(UserAdmin, self).get_queryset(request)
 
 @admin.register(GroupMembership)
 class GroupMembershipAdmin(admin.ModelAdmin):
     search_fields = ['is_teacher', 'group', 'user']
     fields = ('is_teacher', 'group', 'user')
     list_display = ('is_teacher', 'group', 'user')
+    def get_queryset(self, request):
+        return super(GroupMembershipAdmin, self).get_queryset(request).filter(user__id=request.user.id)
 
 
 @admin.register(Task)
