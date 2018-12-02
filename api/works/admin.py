@@ -28,7 +28,7 @@ class TestResultInline(admin.TabularInline):
 
     def has_add_permission(self, obj):
         return False
-        
+
 
 class GroupMembershipInline(admin.TabularInline):
     model = GroupMembership
@@ -43,6 +43,13 @@ class OrganizationAdmin(admin.ModelAdmin):
         GroupInline,
         TasksListInline,
     ]
+    def get_queryset(self, request):
+        if request.user.is_superuser:
+            return super(OrganizationAdmin, self).get_queryset(request)
+        elif request.user.status == User.ADMIN:
+            return super(OrganizationAdmin, self).get_queryset(request).filter(user__organization=request.user.organization)
+        else:
+            return []
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
@@ -52,17 +59,35 @@ class GroupAdmin(admin.ModelAdmin):
     inlines = [
         GroupMembershipInline,
     ]
-
+    def get_queryset(self, request):
+        if request.user.is_superuser:
+            return super(GroupAdmin, self).get_queryset(request)
+        if request.user.status == User.TEACHER:
+            return super(GroupAdmin, self).get_queryset(request).filter(groupmembership__group=request.user.group)
+        elif request.user.status == User.STUDENT:
+            return [super(GroupAdmin, self).get_queryset(request).filter(user__id=request.user.id)]
+        elif request.user.status == User.ADMIN:
+            return super(GroupAdmin, self).get_queryset(request).filter(organization=request.user.organization)
 
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
     search_fields = ['task', 'file', 'accepted_by', 'student']
-    fields = ('task', 'file', 'accepted_by', 'student')
+    fields = ('task', 'file', 'accepted_by', 'student', 'passed')
     list_display = ('task', 'accepted_by', 'student', 'passed')
     inlines = [
         TestResultInline,
     ]
+    def get_queryset(self, request):
+        if request.user.is_superuser:
+            return super(ReportAdmin, self).get_queryset(request)
+        if request.user.status == User.TEACHER:
+            return super(ReportAdmin, self).get_queryset(request).filter(student__id=request.user.id)
+        elif request.user.status == User.STUDENT:
+            return []
+        elif request.user.status == User.ADMIN:
+            return super(ReportAdmin, self).get_queryset(request).filter(student__organization=request.user.organization)
+
 
 
 @admin.register(User)
@@ -79,19 +104,37 @@ class UserAdmin(BaseUserAdmin):
         ),
     )
     list_display = ('first_name', 'last_name', 'organization', 'status', 'username', 'is_staff', 'password')
+    list_display_links = ('first_name', 'last_name', 'organization', 'status', 'username', 'is_staff', 'password')
     inlines = [
         GroupMembershipInline,
     ]
+    def get_queryset(self, request):
+        if request.user.is_superuser:
+            return super(UserAdmin, self).get_queryset(request)
+        if request.user.status == User.TEACHER:
+            return super(UserAdmin, self).get_queryset(request).filter(status=User.STUDENT,
+                group__in=GroupMembership.objects.filter(is_teacher=True, user=request.user).values_list('group', flat=True))
+        elif request.user.status == User.STUDENT:
+            return []
+        elif request.user.status == User.ADMIN:
+            return super(UserAdmin, self).get_queryset(request).filter(organization=request.user.organization)
 
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     search_fields = ['title']
-    fields = ('title', 'description')
-    list_display =  ('title', 'description')
+    fields = ('title', 'description','organization')
+    list_display =  ('title', 'description', 'organization')
     inlines = [
         TestForTaskInline,
     ]
     exclude = ('test',)
     def get_queryset(self, request):
-        return super(TaskAdmin, self).get_queryset(request).filter(task_list__organization=request.user.organization)
+        if request.user.is_superuser:
+            return super(TaskAdmin, self).get_queryset(request)
+        if request.user.status == User.TEACHER:
+            return super(TaskAdmin, self).get_queryset(request).filter(organization=request.user.organization)
+        elif request.user.status == User.STUDENT:
+            return super(TaskAdmin, self).get_queryset(request).filter(task_list__group=request.user.group)
+        elif request.user.status == User.ADMIN:
+            return super(TaskAdmin, self).get_queryset(request).filter(organization=request.user.organization)
