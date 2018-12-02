@@ -1,5 +1,6 @@
 from django.contrib import admin
 from works.models import User, Organization, GroupMembership, Group, TasksList, TaskAssign, Task, Test, TestResult, Report
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 class OrganizationInline(admin.TabularInline):
     model = Organization
@@ -16,6 +17,9 @@ class TasksListInline(admin.TabularInline):
 class TaskInline(admin.TabularInline):
     model = Task
     extra = 0
+
+class TestForTaskInline(admin.TabularInline):
+    model = Test.task.through
 
 class UserInline(admin.TabularInline):
     model = User
@@ -56,10 +60,6 @@ class GroupAdmin(admin.ModelAdmin):
     ]
 
 
-@admin.register(TasksList)
-class TasksListAdmin(admin.ModelAdmin):
-    fields = ('id', )
-    list_display = ('id', )
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
@@ -69,15 +69,28 @@ class ReportAdmin(admin.ModelAdmin):
     inlines = [
         TestResultInline,
     ]
+    #def get_queryset(self, request):
+    #    return super(ReportAdmin, self).get_queryset(request).filter(status__user=request.user.status)
+
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    search_fields = ['first_name', 'last_name', 'organization', 'status']
-    fields = ('first_name', 'last_name', 'organization', 'status')
-    list_display = ('first_name', 'last_name', 'organization', 'status')
+class UserAdmin(BaseUserAdmin):
+    search_fields = ['first_name', 'last_name', 'organization', 'status', 'username', 'is_staff', 'password']
+    fieldsets = (
+        ('Personal info', {
+            'fields': ('first_name', 'last_name')
+            }
+        ),
+        ('The rest of important things', {
+            'fields': ('organization', 'status', 'username', 'is_staff', 'password')
+            }
+        ),
+    )
+    list_display = ('first_name', 'last_name', 'organization', 'status', 'username', 'is_staff', 'password')
     inlines = [
         GroupMembershipInline,
     ]
+
 
 @admin.register(GroupMembership)
 class GroupMembershipAdmin(admin.ModelAdmin):
@@ -91,7 +104,12 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ['title']
     fields = ('title', 'description')
     list_display =  ('title', 'description')
-
+    inlines = [
+        TestForTaskInline,
+    ]
+    exclude = ('test',)
+    def get_queryset(self, request):
+        return super(TaskAdmin, self).get_queryset(request).filter(task_list__organization=request.user.organization)
 
 @admin.register(Test)
 class TestAdmin(admin.ModelAdmin):

@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 
 
 class User(AbstractUser):
@@ -21,6 +23,50 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} - {self.username}'
+
+    def save(self, *args, **kwargs):
+        super(User, self).save(*args, **kwargs)
+
+        if self.status == self.STUDENT:
+            self.user_permissions.clear()
+            self.user_permissions.add(Permission.objects.get(codename='view_report'),
+            Permission.objects.get(codename='add_report'),
+            Permission.objects.get(codename='view_testresult'),
+            Permission.objects.get(codename='view_taskslist'),
+            Permission.objects.get(codename='view_task'),
+            Permission.objects.get(codename='view_test'))
+
+        if self.status == self.TEACHER:
+            self.user_permissions.clear()
+            self.user_permissions.add(Permission.objects.get(codename='view_report'),
+            Permission.objects.get(codename='change_report'),
+            Permission.objects.get(codename='view_testresult'),
+            Permission.objects.get(codename='view_taskslist'),
+            Permission.objects.get(codename='add_taskslist'),
+            Permission.objects.get(codename='change_taskslist'),
+            Permission.objects.get(codename='delete_taskslist'),
+            Permission.objects.get(codename='view_task'),
+            Permission.objects.get(codename='add_task'),
+            Permission.objects.get(codename='change_task'),
+            Permission.objects.get(codename='delete_task'),
+            Permission.objects.get(codename='view_test'),
+            Permission.objects.get(codename='change_test'),
+            Permission.objects.get(codename='add_test'),
+            Permission.objects.get(codename='delete_test'),
+            Permission.objects.get(codename='view_groupmembership'),
+            Permission.objects.get(codename='add_groupmembership'),
+            Permission.objects.get(codename='delete_groupmembership'),
+            Permission.objects.get(codename='change_groupmembership'),
+            Permission.objects.get(codename='view_group', content_type__app_label='works'),
+            Permission.objects.get(codename='add_groupmembership'),
+            Permission.objects.get(codename='delete_groupmembership'),
+            Permission.objects.get(codename='change_groupmembership'))
+
+        if self.status == self.ADMIN:
+            self.user_permissions.clear()
+            self.user_permissions.set(Permission.objects.all())
+
+
 
 
 class Organization(models.Model):
