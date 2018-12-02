@@ -19,7 +19,7 @@ class TaskInline(admin.TabularInline):
     extra = 0
 
 class TestForTaskInline(admin.TabularInline):
-    model = Test.task.through
+    model = Test
 
 class UserInline(admin.TabularInline):
     model = User
@@ -63,14 +63,12 @@ class GroupAdmin(admin.ModelAdmin):
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    search_fields = ['task', 'accepted_by', 'student']
-    fields = ('task', 'accepted_by', 'student')
-    list_display = ('task', 'accepted_by', 'student' )
+    search_fields = ['task', 'file', 'accepted_by', 'student']
+    fields = ('task', 'file', 'accepted_by', 'student')
+    list_display = ('task', 'accepted_by', 'student', 'passed')
     inlines = [
         TestResultInline,
     ]
-    #def get_queryset(self, request):
-    #    return super(ReportAdmin, self).get_queryset(request).filter(status__user=request.user.status)
 
 
 @admin.register(User)
@@ -120,6 +118,6 @@ class TestAdmin(admin.ModelAdmin):
 
 @admin.register(TestResult)
 class TestResultAdmin(admin.ModelAdmin):
-    search_fields = ['error', 'status', 'line']
-    fields = ('error', 'status', 'line')
-    list_display = ('error', 'status', 'line')
+    search_fields = ['error', 'passed', 'line']
+    fields = ('error', 'passed', 'line')
+    list_display = ('error', 'passed', 'line')
