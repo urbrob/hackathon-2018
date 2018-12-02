@@ -96,6 +96,7 @@ class Group(models.Model):
 
 
 class TasksList(models.Model):
+    name = models.CharField(max_length=150)
     group = models.ManyToManyField(Group)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
 
@@ -106,6 +107,7 @@ class TasksList(models.Model):
 class TaskAssign(models.Model):
     task_list = models.ForeignKey(TasksList, on_delete=models.CASCADE)
     task = models.ForeignKey('Task', on_delete=models.CASCADE)
+    is_required = models.BooleanField(default=False)
     deadline_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
@@ -114,11 +116,13 @@ class TaskAssign(models.Model):
 
 class Task(models.Model):
     task_list = models.ManyToManyField(TasksList, through='TaskAssign')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='tasks')
     title = models.CharField(max_length=50)
     description = models.TextField()
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_tasks')
 
     def __str__(self):
-        return f'{self.title}'
+        return f'{self.title} - {self.description}'
 
 
 class Test(models.Model):
@@ -133,6 +137,8 @@ class Test(models.Model):
     function_name = models.CharField(max_length=100, null=True, blank=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='tests')
 
+    def __str__(self):
+        return f'{self.test_type} -> {self.value} in {self.function_name} for {self.task.title}'
 
 
 class TestResult(models.Model):
@@ -150,10 +156,10 @@ class Report(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='reports', null=True, blank=True)
     student = models.ForeignKey(User, on_delete=models.CASCADE)
-    teacher_comment = models.CharField(null=True, max_length=250)
+    teacher_comment = models.TextField(null=True)
     passed = models.NullBooleanField()
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     file = models.FileField(upload_to='reports/')
 
     def __str__(self):
-        return f'{self.task.title} - {self.tests_result} by {self.student.first_name} {self.student.last_name}'
+        return f'{self.task.title}'

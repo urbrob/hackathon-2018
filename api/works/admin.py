@@ -2,9 +2,6 @@ from django.contrib import admin
 from works.models import User, Organization, GroupMembership, Group, TasksList, TaskAssign, Task, Test, TestResult, Report
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-class OrganizationInline(admin.TabularInline):
-    model = Organization
-    extra = 0
 
 class GroupInline(admin.TabularInline):
     model = Group
@@ -20,22 +17,18 @@ class TaskInline(admin.TabularInline):
 
 class TestForTaskInline(admin.TabularInline):
     model = Test
-
-class UserInline(admin.TabularInline):
-    model = User
     extra = 0
 
-class TestInline(admin.TabularInline):
-    model = Test
-    extra = 0
 
 class TestResultInline(admin.TabularInline):
     model = TestResult
     extra = 0
+    readonly_fields = ('report', 'test', 'error', 'passed', 'line')
+    max_num = 0
 
-class ReportInline(admin.TabularInline):
-    model = Report
-    extra = 0
+    def has_add_permission(self, obj):
+        return False
+        
 
 class GroupMembershipInline(admin.TabularInline):
     model = GroupMembership
@@ -44,7 +37,8 @@ class GroupMembershipInline(admin.TabularInline):
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     search_fields = ['name', 'address', 'email_contact', 'phone_contact']
-    fields =  ('name', 'address', 'email_contact', 'phone_contact')
+    fields = ('name', 'address', 'email_contact', 'phone_contact')
+    list_display = ('name', 'address', 'email_contact', 'phone_contact')
     inlines = [
         GroupInline,
         TasksListInline,
@@ -90,13 +84,6 @@ class UserAdmin(BaseUserAdmin):
     ]
 
 
-@admin.register(GroupMembership)
-class GroupMembershipAdmin(admin.ModelAdmin):
-    search_fields = ['is_teacher', 'group', 'user']
-    fields = ('is_teacher', 'group', 'user')
-    list_display = ('is_teacher', 'group', 'user')
-
-
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     search_fields = ['title']
@@ -108,16 +95,3 @@ class TaskAdmin(admin.ModelAdmin):
     exclude = ('test',)
     def get_queryset(self, request):
         return super(TaskAdmin, self).get_queryset(request).filter(task_list__organization=request.user.organization)
-
-@admin.register(Test)
-class TestAdmin(admin.ModelAdmin):
-    inlines = [
-        TestResultInline,
-    ]
-
-
-@admin.register(TestResult)
-class TestResultAdmin(admin.ModelAdmin):
-    search_fields = ['error', 'passed', 'line']
-    fields = ('error', 'passed', 'line')
-    list_display = ('error', 'passed', 'line')
