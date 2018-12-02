@@ -1,5 +1,6 @@
 from django.contrib import admin
 from works.models import User, Organization, GroupMembership, Group, TasksList, TaskAssign, Task, Test, TestResult, Report
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 class OrganizationInline(admin.TabularInline):
     model = Organization
@@ -73,13 +74,23 @@ class ReportAdmin(admin.ModelAdmin):
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    search_fields = ['first_name', 'last_name', 'organization', 'status']
-    fields = ('first_name', 'last_name', 'organization', 'status', 'username')
-    list_display = ('first_name', 'last_name', 'organization', 'status', 'username')
+class UserAdmin(BaseUserAdmin):
+    search_fields = ['first_name', 'last_name', 'organization', 'status', 'username', 'is_staff', 'password']
+    fieldsets = (
+        ('Personal info', {
+            'fields': ('first_name', 'last_name')
+            }
+        ),
+        ('The rest of important things', {
+            'fields': ('organization', 'status', 'username', 'is_staff', 'password')
+            }
+        ),
+    )
+    list_display = ('first_name', 'last_name', 'organization', 'status', 'username', 'is_staff', 'password')
     inlines = [
         GroupMembershipInline,
     ]
+
 
 @admin.register(GroupMembership)
 class GroupMembershipAdmin(admin.ModelAdmin):
