@@ -38,7 +38,8 @@ class User(AbstractUser):
 
         if self.status == self.TEACHER:
             self.user_permissions.clear()
-            self.user_permissions.add(Permission.objects.get(codename='view_report'),
+            self.user_permissions.add(Permission.objects.get(codename='view_users'),
+            Permission.objects.get(codename='view_report'),
             Permission.objects.get(codename='change_report'),
             Permission.objects.get(codename='view_testresult'),
             Permission.objects.get(codename='view_taskslist'),
