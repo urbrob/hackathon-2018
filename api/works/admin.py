@@ -63,9 +63,9 @@ class TasksListAdmin(admin.ModelAdmin):
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    search_fields = ['task', 'accepted_by', 'student']
-    fields = ('task', 'accepted_by', 'student')
-    list_display = ('task', 'accepted_by', 'student' )
+    search_fields = ['task', 'file', 'accepted_by', 'student']
+    fields = ('task', 'file', 'accepted_by', 'student')
+    list_display = ('task', 'accepted_by', 'student', 'passed')
     inlines = [
         TestResultInline,
     ]
@@ -102,6 +102,6 @@ class TestAdmin(admin.ModelAdmin):
 
 @admin.register(TestResult)
 class TestResultAdmin(admin.ModelAdmin):
-    search_fields = ['error', 'status', 'line']
-    fields = ('error', 'status', 'line')
-    list_display = ('error', 'status', 'line')
+    search_fields = ['error', 'passed', 'line']
+    fields = ('error', 'passed', 'line')
+    list_display = ('error', 'passed', 'line')

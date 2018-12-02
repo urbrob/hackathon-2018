@@ -85,37 +85,29 @@ class Test(models.Model):
     test_type = models.CharField(choices=TEST_TYPES, max_length=50)
     value = models.CharField(max_length=100, null=True, blank=True)
     function_name = models.CharField(max_length=100, null=True, blank=True)
-    task = models.ManyToManyField(Task)
-    file = models.FileField(upload_to='reports/')
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='tests')
 
 
 
 class TestResult(models.Model):
-    IN_PROGRESS = 'in-progress'
-    FAILED = 'failed'
-    PASSED = 'passed'
-    TASK_STATUSES = (
-        (IN_PROGRESS, 'In progress'),
-        (FAILED, 'Failed'),
-        (PASSED, 'Passed')
-    )
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
-    report = models.ForeignKey('Report', on_delete=models.CASCADE)
-    task = models.ForeignKey('Task', on_delete=models.CASCADE)
+    report = models.ForeignKey('Report', on_delete=models.CASCADE, related_name='tests_result')
     error = models.CharField(null=True, max_length=150)
-    status = models.CharField(max_length=30, choices=TASK_STATUSES)
+    passed = models.NullBooleanField()
     line = models.IntegerField(null=True)
 
     def __str__(self):
-        return f'{self.task.title} {self.report.id} - {self.status}'
+        return f'{self.test.task.title} {self.report.id} - {self.passed}'
 
 
 class Report(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='reports', null=True)
+    accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='reports', null=True, blank=True)
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     teacher_comment = models.CharField(null=True, max_length=250)
+    passed = models.NullBooleanField()
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    file = models.FileField(upload_to='reports/')
 
     def __str__(self):
-        return f'{self.taask.title} - {self.tests_result}'
+        return f'{self.task.title} - {self.tests_result} by {self.student.first_name} {self.student.last_name}'

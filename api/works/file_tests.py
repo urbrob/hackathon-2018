@@ -1,6 +1,7 @@
-def test_value_function(file, function_name):
-    exec("""def test2():
-                print('lets see if multi line works....')
-""")
+def test_value_function(file, function_name, value):
+    exec(file.read())
+    return True if locals()[function_name]() == value else False
 
-    test2()
+def test_type_function(file, function_name, type):
+    exec(file.read())
+    return True if type(locals()[function_name]()) == type else False
