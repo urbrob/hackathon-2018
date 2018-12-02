@@ -63,7 +63,7 @@ class GroupAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return super(GroupAdmin, self).get_queryset(request)
         if request.user.status == User.TEACHER:
-            return super(GroupAdmin, self).get_queryset(request).filter(groupmembership__group=request.user.group)
+            return super(GroupAdmin, self).get_queryset(request).filter(organization=request.user.organization)
         elif request.user.status == User.STUDENT:
             return [super(GroupAdmin, self).get_queryset(request).filter(user__id=request.user.id)]
         elif request.user.status == User.ADMIN:
@@ -84,7 +84,7 @@ class ReportAdmin(admin.ModelAdmin):
         if request.user.status == User.TEACHER:
             return super(ReportAdmin, self).get_queryset(request).filter(student__id=request.user.id)
         elif request.user.status == User.STUDENT:
-            return []
+            return super(ReportAdmin, self).get_queryset(request).filter(student__id=request.user.id)
         elif request.user.status == User.ADMIN:
             return super(ReportAdmin, self).get_queryset(request).filter(student__organization=request.user.organization)
 
@@ -135,6 +135,6 @@ class TaskAdmin(admin.ModelAdmin):
         if request.user.status == User.TEACHER:
             return super(TaskAdmin, self).get_queryset(request).filter(organization=request.user.organization)
         elif request.user.status == User.STUDENT:
-            return super(TaskAdmin, self).get_queryset(request).filter(task_list__group=request.user.group)
+            return super(TaskAdmin, self).get_queryset(request).filter(task_list__group__in=request.user.group.all())
         elif request.user.status == User.ADMIN:
             return super(TaskAdmin, self).get_queryset(request).filter(organization=request.user.organization)
