@@ -14,7 +14,7 @@ decorator==4.3.0
 dropbox
 defusedxml==0.5.0
 dj-database-url==0.5.0
-Django==2.0.8
+Django==2.2.24
 django-allauth==0.37.1
 django-appconf==1.0.2
 django-celery-email==2.0.0
